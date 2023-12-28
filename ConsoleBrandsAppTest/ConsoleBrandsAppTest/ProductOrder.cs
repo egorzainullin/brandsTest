@@ -1,8 +1,10 @@
+using System.Globalization;
+
 namespace ConsoleBrandsAppTest;
 
 public record struct ProductOrder
 {
-    public ProductOrder(Cost price, string productName, string category, string brand)
+    private ProductOrder(Cost price, string productName, string category, string brand)
     {
         this.Price = price;
         this.ProductName = productName;
@@ -18,7 +20,7 @@ public record struct ProductOrder
 
     public string Brand { get; }
 
-    private static string _categoryCode = "category_code";
+    private static string _category = "category_id";
 
     private static string _brand = "brand";
 
@@ -30,7 +32,7 @@ public record struct ProductOrder
     {
         var columns = toParse.Split(",");
         var costStringToParse = columns[order[_price]];
-        if (!Double.TryParse(costStringToParse, out var priceDouble))
+        if (!Double.TryParse(costStringToParse, CultureInfo.InvariantCulture, out var priceDouble))
         {
             throw new ArgumentException("Price can't be parsed as double.");
         }
@@ -38,7 +40,7 @@ public record struct ProductOrder
         var priceInCents = (int)Math.Round(priceDouble * 100);
         var cost = Cost.ToCost(priceInCents);
         var productName = columns[order[_product]];
-        var category = columns[order[_categoryCode]];
+        var category = columns[order[_category]];
         var brand = columns[order[_brand]];
         return new ProductOrder(cost, productName, category, brand);
     }

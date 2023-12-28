@@ -2,8 +2,11 @@ namespace ConsoleBrandsAppTest;
 
 public class Core
 {
-    public long GetPriceSum(IEnumerable<ProductOrder> products)
+    public static Cost GetPriceSum(IEnumerable<ProductOrder> products)
     {
-        return 0;
+        var sum = products
+            .Select(x => x.Price)
+            .Aggregate((x, acc) => x + acc);
+        return sum;
     }
 }

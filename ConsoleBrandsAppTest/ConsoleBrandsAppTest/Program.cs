@@ -1,5 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using System.Globalization;
+
 namespace ConsoleBrandsAppTest;
 
 public static class Program
@@ -16,8 +18,12 @@ public static class Program
             for (int i = 0; i < columnsArray.Length; i++)
             {
                 dicOrder[columnsArray[i]] = i;
-                Console.WriteLine(columnsArray[i]);
             }
+
+            
+            var lineToParse = streamReader.ReadLine();
+            var productOrder = ProductOrder.ParseProduct(lineToParse, dicOrder);
+            Console.WriteLine(productOrder);
         }
     }
 }
