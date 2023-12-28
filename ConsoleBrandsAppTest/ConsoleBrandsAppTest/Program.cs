@@ -1,16 +1,14 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using System.Globalization;
-
 namespace ConsoleBrandsAppTest;
 
 public static class Program
 {
-    private static string link = "2019-Oct.csv";
+    private const string Link = "2019-Oct.csv";
 
     public static void Main()
     {
-        using (var streamReader = new StreamReader(link))
+        using (var streamReader = new StreamReader(Link))
         {
             var columns = streamReader.ReadLine();
             var columnsArray = columns.Split(",");
@@ -20,10 +18,8 @@ public static class Program
                 dicOrder[columnsArray[i]] = i;
             }
 
-            
-            var lineToParse = streamReader.ReadLine();
-            var productOrder = ProductOrder.ParseProduct(lineToParse, dicOrder);
-            Console.WriteLine(productOrder);
+            var collection = new ReaderToEnumerable(streamReader, dicOrder);
+            Core.GetPriceSum(collection);
         }
     }
 }
