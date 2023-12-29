@@ -7,10 +7,11 @@ public static class Core
         long elementsAddedCount = 0;
         var sum = products
             .Select(x => x.Price)
-            .Aggregate((x, acc) =>
+            .Aggregate((acc, x) =>
             {
                 ++elementsAddedCount;
-                if (elementsAddedCount % 1000000 == 0)
+                long progressNotification = 1000000;
+                if (elementsAddedCount % progressNotification == 0)
                 {
                     Console.SetCursorPosition(0, 1);
                     Console.WriteLine($"Number of elements in sum {elementsAddedCount}");

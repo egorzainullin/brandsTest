@@ -8,18 +8,9 @@ public static class Program
 
     public static void Main()
     {
-        using (var streamReader = new StreamReader(Link))
-        {
-            var columns = streamReader.ReadLine();
-            var columnsArray = columns.Split(",");
-            var dicOrder = new Dictionary<string, int>();
-            for (int i = 0; i < columnsArray.Length; i++)
-            {
-                dicOrder[columnsArray[i]] = i;
-            }
-
-            var collection = new ReaderToEnumerable(streamReader, dicOrder);
-            Core.GetPriceSum(collection);
-        }
+        using var streamReader = new StreamReader(Link);
+        var collectionStreamToProductOrder = new StreamToProductOrder(streamReader);
+        var collection = collectionStreamToProductOrder.ToOrders();
+        Core.GetPriceSum(collection);
     }
 }

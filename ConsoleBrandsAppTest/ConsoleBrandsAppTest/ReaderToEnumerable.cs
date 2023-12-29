@@ -32,6 +32,7 @@ public class ReaderToEnumerable(StreamReader reader, Dictionary<string, int> ord
         {
             reader.DiscardBufferedData();
             reader.BaseStream.Seek(0, SeekOrigin.Begin);
+            reader.ReadLine();
         }
 
         public ProductOrder Current { get; private set; }
