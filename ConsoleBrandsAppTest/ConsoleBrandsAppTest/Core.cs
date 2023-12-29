@@ -2,13 +2,17 @@ namespace ConsoleBrandsAppTest;
 
 public static class Core
 {
-    public static Cost GetPriceSum(IEnumerable<ProductOrder> products)
+    public static Cost GetPriceSum(IEnumerable<ProductOrder> products, CancellationToken token)
     {
         long elementsAddedCount = 0;
         var sum = products
             .Select(x => x.Price)
             .Aggregate((acc, x) =>
             {
+                if (token.IsCancellationRequested)
+                {
+                    token.ThrowIfCancellationRequested();
+                }
                 ++elementsAddedCount;
                 long progressNotification = 1000000;
                 if (elementsAddedCount % progressNotification == 0)

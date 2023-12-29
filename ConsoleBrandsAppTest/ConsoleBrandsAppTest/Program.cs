@@ -9,8 +9,15 @@ public static class Program
     public static void Main()
     {
         using var streamReader = new StreamReader(Link);
-        var collectionStreamToProductOrder = new StreamToProductOrder(streamReader);
-        var collection = collectionStreamToProductOrder.ToOrders();
-        Core.GetPriceSum(collection);
+        var source = new CancellationTokenSource();
+        var token = source.Token;
+        Task.Run(() =>
+        {
+            var collectionStreamToProductOrder = new StreamToProductOrder(streamReader);
+            var collection = collectionStreamToProductOrder.ToOrders();
+            Core.GetPriceSum(collection, token);
+        }, token);
+        Thread.Sleep(2000);
+        source.Cancel();
     }
 }
