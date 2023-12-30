@@ -8,9 +8,6 @@ public static class Program
 
     public static void Main()
     {
-        using var streamReader1 = new StreamReader(Link);
-        using var streamReader2 = new StreamReader(Link);
-
         using var source = new CancellationTokenSource();
         var token = source.Token;
 
