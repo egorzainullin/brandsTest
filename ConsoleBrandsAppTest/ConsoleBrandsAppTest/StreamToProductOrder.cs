@@ -1,11 +1,11 @@
 namespace ConsoleBrandsAppTest;
 
-public class StreamToProductOrder(StreamReader streamReader, CancellationToken token)
+public static class StreamToProductOrder
 {
-    public IEnumerable<ProductOrder> ToOrders()
+    public static IEnumerable<ProductOrder> ToOrders(StreamReader streamReader, CancellationToken token)
     {
         streamReader.DiscardBufferedData();
-        streamReader.BaseStream.Seek(0, System.IO.SeekOrigin.Begin);
+        streamReader.BaseStream.Seek(0, SeekOrigin.Begin);
         var columns = streamReader.ReadLine();
         var columnsArray = columns.Split(",");
         var dicOrder = new Dictionary<string, int>();

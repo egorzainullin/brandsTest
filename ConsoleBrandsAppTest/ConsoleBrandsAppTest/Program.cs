@@ -14,9 +14,8 @@ public static class Program
         using var source = new CancellationTokenSource();
         var token = source.Token;
 
-        var streamToProductOrder = new StreamToProductOrder(streamReader2, token);
-        var collectionFromStream = streamToProductOrder.ToOrders();
-        Console.WriteLine(Core.GetMostPopular(collectionFromStream, token));
+        var core = new Core(Link, token);
+        Console.WriteLine(core.GetMostPopular());
 
         // Task.Run(() =>
         // {

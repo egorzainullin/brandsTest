@@ -1,9 +1,11 @@
 namespace ConsoleBrandsAppTest;
 
-public static class Core
+public class Core(string link, CancellationToken token)
 {
-    public static Cost GetPriceSum(IEnumerable<ProductOrder> products, CancellationToken token)
+    public Cost GetPriceSum()
     {
+        using var streamReader = new StreamReader(link);
+        var products = StreamToProductOrder.ToOrders(streamReader, token);
         long elementsAddedCount = 0;
         var sum = products
             .Select(x => x.Price)
@@ -29,20 +31,24 @@ public static class Core
         return sum;
     }
 
-    public static MostPopular GetMostPopular(IEnumerable<ProductOrder> products, CancellationToken token)
+    public MostPopular GetMostPopular()
     {
         string mostPopularBrand = null;
         long mostPopularBrandCount = 0;
         long i = -1;
+        using var streamReader = new StreamReader(link);
+        var products = StreamToProductOrder.ToOrders(streamReader, token);
         foreach (var order in products)
         {
             ++i;
             long currentBrandCount = 1;
             var currentBrand = order.Brand;
             var toSkip = i;
-            foreach (var nextOrder in products)
+            using var innerStreamReader = new StreamReader(link);
+            var innerProducts = StreamToProductOrder.ToOrders(innerStreamReader, token);
+            foreach (var nextOrder in innerProducts)
             {
-                if (toSkip > 0)
+                if (toSkip >= 0)
                 {
                     --toSkip;
                     continue;
@@ -54,6 +60,12 @@ public static class Core
                 }
             }
 
+            
+            Console.SetCursorPosition(0, 2);
+            Console.Write(new String(' ', Console.BufferWidth));
+            Console.SetCursorPosition(0, 2);
+            Console.WriteLine($"Current brand {currentBrand} {currentBrandCount}");
+            
             if (currentBrandCount > mostPopularBrandCount)
             {
                 mostPopularBrandCount = currentBrandCount;
