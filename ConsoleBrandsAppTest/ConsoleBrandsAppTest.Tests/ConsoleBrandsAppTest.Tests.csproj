@@ -23,6 +23,22 @@
     <Content Include="order_file.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Remove="order_empty_brand.csv" />
+    <Content Include="order_empty_brand.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Remove="order_empty_category.csv" />
+    <Content Include="order_empty_category.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Remove="order_empty_product.csv" />
+    <Content Include="order_empty_product.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Remove="order_emty_file.csv" />
+    <Content Include="order_empty_file.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   
 </Project>

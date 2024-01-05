@@ -2,6 +2,9 @@ using System.Globalization;
 
 namespace ConsoleBrandsAppTest;
 
+/// <summary>
+/// Class that represents order.
+/// </summary>
 public record struct ProductOrder
 {
     private ProductOrder(Cost price, string productName, string category, string brand)
@@ -28,6 +31,13 @@ public record struct ProductOrder
 
     private static string _product = "product_id";
 
+    /// <summary>
+    /// Parses string to order by using given match.
+    /// </summary>
+    /// <param name="toParse">String to parse.</param>
+    /// <param name="order">given match.</param>
+    /// <returns>Product order which matches given string.</returns>
+    /// <exception cref="ArgumentException">Throws when price is not correct.</exception>
     public static ProductOrder ParseProduct(string toParse, Dictionary<string, int> order)
     {
         var columns = toParse.Split(",");

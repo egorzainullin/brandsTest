@@ -1,7 +1,16 @@
 namespace ConsoleBrandsAppTest;
 
+/// <summary>
+/// This class converts input from stream to products orders.
+/// </summary>
 public static class StreamToProductOrder
 {
+    /// <summary>
+    /// Converts stream to produces orders.
+    /// </summary>
+    /// <param name="streamReader">Stream to read.</param>
+    /// <param name="token">Token that cancels conversion.</param>
+    /// <returns>Collection of product orders.</returns>
     public static IEnumerable<ProductOrder> ToOrders(StreamReader streamReader, CancellationToken token)
     {
         streamReader.DiscardBufferedData();

@@ -1,6 +1,9 @@
 namespace ConsoleBrandsAppTest;
 
-public record struct MostPopular(string Brand, string Category, string Product)
+/// <summary>
+/// This class represents most popular brand, category and product.
+/// </summary>
+public readonly record struct MostPopular(string Brand, string Category, string Product)
 {
     public string Brand { get; } = Brand;
 

@@ -1,5 +1,10 @@
 namespace ConsoleBrandsAppTest;
 
+/// <summary>
+/// Main class that calculates all cost, most popular brand, category and product.
+/// </summary>
+/// <param name="link">Link to file from which program gets data.</param>
+/// <param name="token">Token which is supposed to stop calculation.</param>
 public class Core(string link, CancellationToken token)
 {
     private string _mostPopularBrand = "None";
@@ -14,26 +19,27 @@ public class Core(string link, CancellationToken token)
     private long _mostPopularProductCount = 0;
     private readonly IDictionary<string, long> _popularityProductDictionary = new Dictionary<string, long>();
 
+    /// <summary>
+    ///  Gets all cost from orders.
+    /// </summary>
+    /// <returns>Cost in dollars and cents.</returns>
     public Cost GetPriceSum()
     {
         using var streamReader = new StreamReader(link);
         var products = StreamToProductOrder.ToOrders(streamReader, token);
-        long elementsAddedCount = 0;
-        var sum = products
-            .Select(x => x.Price)
-            .Aggregate((acc, x) =>
-            {
-                if (token.IsCancellationRequested)
-                {
-                    token.ThrowIfCancellationRequested();
-                }
-
-                ++elementsAddedCount;
-                return x + acc;
-            });
+        var sum = new Cost();
+        foreach (var productOrder in products)
+        {
+            sum += productOrder.Price;
+        }
         return sum;
     }
 
+    /// <summary>
+    /// Adds one if it contains in current element.
+    /// </summary>
+    /// <param name="dic">Dictionary to add.</param>
+    /// <param name="elementToAdd">Element to which one should be added.</param>
     private static void UpdatePopularityDictionary(IDictionary<string, long> dic, string elementToAdd)
     {
         if (!dic.TryAdd(elementToAdd, 1))
@@ -42,6 +48,10 @@ public class Core(string link, CancellationToken token)
         }
     }
 
+    /// <summary>
+    /// Calculates popularity of brand, category and product. 
+    /// </summary>
+    /// <param name="products">Products to process.</param>
     private void CalculatePopularity(IEnumerable<ProductOrder> products)
     {
         foreach (var order in products)
@@ -54,12 +64,14 @@ public class Core(string link, CancellationToken token)
             UpdatePopularityDictionary(_popularityBrandDictionary, order.Brand);
             UpdatePopularityDictionary(_popularityCategoryDictionary, order.Category);
             UpdatePopularityDictionary(_popularityProductDictionary, order.ProductName);
-
-            long elementsProcessedCount = 0;
-            ++elementsProcessedCount;
         }
     }
 
+    /// <summary>
+    /// Get most popular brand, category or product from popularity dictionary.
+    /// </summary>
+    /// <param name="dic">Dictionary to process.</param>
+    /// <returns>Tuple of most popular element and its count in dictionary.</returns>
     private (string mostPopular, long count) GetMostPopularAndCount(IDictionary<string, long> dic)
     {
         var mostPopular = "None";
@@ -81,6 +93,10 @@ public class Core(string link, CancellationToken token)
         return (mostPopular, count);
     }
 
+    /// <summary>
+    /// Gets most popular brand, category and product. 
+    /// </summary>
+    /// <returns>Most popular brand, category and product.</returns>
     public MostPopular GetMostPopular()
     {
         using var streamReader = new StreamReader(link);
