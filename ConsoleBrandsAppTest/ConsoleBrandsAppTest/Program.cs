@@ -1,6 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-namespace ConsoleBrandsAppTest;
+﻿namespace ConsoleBrandsAppTest;
 
 public static class Program
 {

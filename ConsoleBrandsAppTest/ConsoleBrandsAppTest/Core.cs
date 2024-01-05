@@ -30,6 +30,10 @@ public class Core(string link, CancellationToken token)
         var sum = new Cost();
         foreach (var productOrder in products)
         {
+            if (token.IsCancellationRequested)
+            {
+                token.ThrowIfCancellationRequested();
+            }
             sum += productOrder.Price;
         }
         return sum;
