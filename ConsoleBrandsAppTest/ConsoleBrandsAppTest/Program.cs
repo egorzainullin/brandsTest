@@ -10,27 +10,17 @@ public static class Program
     {
         using var source = new CancellationTokenSource();
         var token = source.Token;
-
         var core = new Core(Link, token);
-        Console.WriteLine(core.GetMostPopular());
+        Task.Run(() => Console.WriteLine(core.GetMostPopular()), token);
+        Task.Run(() => Console.WriteLine(core.GetPriceSum()), token);
 
-        // Task.Run(() =>
-        // {
-        //     var streamToProductOrder = new StreamToProductOrder(streamReader1, token);
-        //     var collection = streamToProductOrder.ToOrders();
-        //     Core.GetPriceSum(collection, token);
-        // }, token);
-        // var line = Console.ReadLine();
-        // const string stopWord = "stop";
-        // if (line == stopWord)
-        // {
-        //     source.Cancel();
-        //     Console.WriteLine("Tasks are stopped");
-        // }
-        //
-        // while (line != String.Empty)
-        // {
-        //     line = Console.ReadLine();
-        // }
+        var line = Console.ReadLine();
+        if (line == "stop")
+        {
+            source.Cancel();
+            Console.WriteLine("Tasks are stopped");
+        }
+
+        Console.ReadLine();
     }
 }

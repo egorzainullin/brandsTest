@@ -2,6 +2,18 @@ namespace ConsoleBrandsAppTest;
 
 public class Core(string link, CancellationToken token)
 {
+    private string _mostPopularBrand = "None";
+    private long _mostPopularBrandCount = 0;
+    private readonly IDictionary<string, long> _popularityBrandDictionary = new Dictionary<string, long>();
+
+    private string _mostPopularCategory = "None";
+    private long _mostPopularCategoryCount = 0;
+    private readonly IDictionary<string, long> _popularityCategoryDictionary = new Dictionary<string, long>();
+
+    private string _mostPopularProduct = "None";
+    private long _mostPopularProductCount = 0;
+    private readonly IDictionary<string, long> _popularityProductDictionary = new Dictionary<string, long>();
+
     public Cost GetPriceSum()
     {
         using var streamReader = new StreamReader(link);
@@ -17,84 +29,67 @@ public class Core(string link, CancellationToken token)
                 }
 
                 ++elementsAddedCount;
-                long progressNotification = 1000000;
-                if (elementsAddedCount % progressNotification == 0)
-                {
-                    Console.SetCursorPosition(0, 1);
-                    Console.WriteLine($"Number of elements in sum {elementsAddedCount}");
-                }
-
                 return x + acc;
             });
-        Console.SetCursorPosition(0, 1);
-        Console.WriteLine($"Sum found {sum}");
         return sum;
+    }
+
+    private static void UpdatePopularityDictionary(IDictionary<string, long> dic, string elementToAdd)
+    {
+        if (!dic.TryAdd(elementToAdd, 1))
+        {
+            ++dic[elementToAdd];
+        }
+    }
+
+    private void CalculatePopularity(IEnumerable<ProductOrder> products)
+    {
+        foreach (var order in products)
+        {
+            if (token.IsCancellationRequested)
+            {
+                token.ThrowIfCancellationRequested();
+            }
+
+            UpdatePopularityDictionary(_popularityBrandDictionary, order.Brand);
+            UpdatePopularityDictionary(_popularityCategoryDictionary, order.Category);
+            UpdatePopularityDictionary(_popularityProductDictionary, order.ProductName);
+
+            long elementsProcessedCount = 0;
+            ++elementsProcessedCount;
+        }
+    }
+
+    private (string mostPopular, long count) GetMostPopularAndCount(IDictionary<string, long> dic)
+    {
+        var mostPopular = "None";
+        long count = 0;
+        foreach (var (key, value) in dic)
+        {
+            if (token.IsCancellationRequested)
+            {
+                token.ThrowIfCancellationRequested();
+            }
+
+            if (key != String.Empty && value > count)
+            {
+                mostPopular = key;
+                count = value;
+            }
+        }
+
+        return (mostPopular, count);
     }
 
     public MostPopular GetMostPopular()
     {
-        string mostPopularBrand = "None";
-        long mostPopularBrandCount = 0;
-        var popularityBrandDictionary = new Dictionary<string, long>();
-
-        string mostPopularCategory = "None";
-        long mostPopularCategoryCount = 0;
-        var popularityCategoryDictionary = new Dictionary<string, long>();
-
-        string mostPopularProduct = "None";
-        long mostPopularProductCount = 0;
-        var popularityProductDictionary = new Dictionary<string, long>();
-        
         using var streamReader = new StreamReader(link);
         var products = StreamToProductOrder.ToOrders(streamReader, token);
-        foreach (var order in products)
-        {
-            if (!popularityBrandDictionary.TryAdd(order.Brand, 1))
-            {
-                ++popularityBrandDictionary[order.Brand];
-            }
-
-            if (!popularityCategoryDictionary.TryAdd(order.Category, 1))
-            {
-                ++popularityCategoryDictionary[order.Category];
-            }
-
-            if (!popularityProductDictionary.TryAdd(order.ProductName, 1))
-            {
-                ++popularityProductDictionary[order.ProductName];
-            }
-        }
-
-        foreach (var (key, value) in popularityBrandDictionary)
-        {
-            if (key != String.Empty && value > mostPopularBrandCount)
-            {
-                mostPopularBrandCount = value;
-                mostPopularBrand = key;
-            }
-        }
-
-        foreach (var (key, value) in popularityCategoryDictionary)
-        {
-            if (key != String.Empty && value > mostPopularCategoryCount)
-            {
-                mostPopularCategoryCount = value;
-                mostPopularCategory = key;
-            }
-        }
-
-        foreach (var (key, value) in popularityProductDictionary)
-        {
-            if (key != String.Empty && value > mostPopularProductCount)
-            {
-                mostPopularProductCount = value;
-                mostPopularProduct = key;
-            }
-        }
-
-        Console.WriteLine($"Brand: {mostPopularBrand}: {mostPopularBrandCount}");
-        Console.WriteLine($"Category: {mostPopularCategory}: {mostPopularCategoryCount}");
-        Console.WriteLine($"Product: {mostPopularProduct}: {mostPopularProductCount}");
-        return new MostPopular(mostPopularBrand, mostPopularCategory, mostPopularProduct);
+        CalculatePopularity(products);
+        (_mostPopularBrand, _mostPopularBrandCount) = GetMostPopularAndCount(_popularityBrandDictionary);
+        (_mostPopularCategory, _mostPopularCategoryCount) = GetMostPopularAndCount(_popularityCategoryDictionary);
+        (_mostPopularProduct, _mostPopularProductCount) = GetMostPopularAndCount(_popularityProductDictionary);
+        return new MostPopular(_mostPopularBrand, _mostPopularCategory, _mostPopularProduct);
     }
 }
+
