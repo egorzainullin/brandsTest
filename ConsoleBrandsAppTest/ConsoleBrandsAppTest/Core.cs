@@ -8,15 +8,12 @@ namespace ConsoleBrandsAppTest;
 public class Core(string link, CancellationToken token)
 {
     private string _mostPopularBrand = "None";
-    private long _mostPopularBrandCount = 0;
     private readonly IDictionary<string, long> _popularityBrandDictionary = new Dictionary<string, long>();
 
     private string _mostPopularCategory = "None";
-    private long _mostPopularCategoryCount = 0;
     private readonly IDictionary<string, long> _popularityCategoryDictionary = new Dictionary<string, long>();
 
     private string _mostPopularProduct = "None";
-    private long _mostPopularProductCount = 0;
     private readonly IDictionary<string, long> _popularityProductDictionary = new Dictionary<string, long>();
 
     /// <summary>
@@ -27,7 +24,8 @@ public class Core(string link, CancellationToken token)
     {
         using var streamReader = new StreamReader(link);
         var products = StreamToProductOrder.ToOrders(streamReader, token);
-        var sum = new Cost();
+        var sum = new Cost(0, 0);
+        long elementsProcessedCount = 0;
         foreach (var productOrder in products)
         {
             if (token.IsCancellationRequested)
@@ -35,8 +33,19 @@ public class Core(string link, CancellationToken token)
                 token.ThrowIfCancellationRequested();
             }
             sum += productOrder.Price;
+            ++elementsProcessedCount;
+            UpdateProgressSum(elementsProcessedCount);
         }
         return sum;
+    }
+
+    private static void UpdateProgressSum(long current)
+    {
+        if (current % 1_000_000 == 0)
+        {
+            Console.SetCursorPosition(0, 1);
+            Console.Write($"Elements in sum processed {current}");
+        }
     }
 
     /// <summary>
@@ -58,6 +67,7 @@ public class Core(string link, CancellationToken token)
     /// <param name="products">Products to process.</param>
     private void CalculatePopularity(IEnumerable<ProductOrder> products)
     {
+        long elementProcessedCount = 0;
         foreach (var order in products)
         {
             if (token.IsCancellationRequested)
@@ -68,6 +78,17 @@ public class Core(string link, CancellationToken token)
             UpdatePopularityDictionary(_popularityBrandDictionary, order.Brand);
             UpdatePopularityDictionary(_popularityCategoryDictionary, order.Category);
             UpdatePopularityDictionary(_popularityProductDictionary, order.ProductName);
+            ++elementProcessedCount;
+            UpdateProgressOfMostPopular(elementProcessedCount);
+        }
+    }
+    
+    private static void UpdateProgressOfMostPopular(long current)
+    {
+        if (current % 1_000_000 == 0)
+        {
+            Console.SetCursorPosition(0, 2);
+            Console.Write($"Elements in popularity processed {current}");
         }
     }
 
@@ -106,9 +127,9 @@ public class Core(string link, CancellationToken token)
         using var streamReader = new StreamReader(link);
         var products = StreamToProductOrder.ToOrders(streamReader, token);
         CalculatePopularity(products);
-        (_mostPopularBrand, _mostPopularBrandCount) = GetMostPopularAndCount(_popularityBrandDictionary);
-        (_mostPopularCategory, _mostPopularCategoryCount) = GetMostPopularAndCount(_popularityCategoryDictionary);
-        (_mostPopularProduct, _mostPopularProductCount) = GetMostPopularAndCount(_popularityProductDictionary);
+        (_mostPopularBrand, _) = GetMostPopularAndCount(_popularityBrandDictionary);
+        (_mostPopularCategory, _) = GetMostPopularAndCount(_popularityCategoryDictionary);
+        (_mostPopularProduct, _) = GetMostPopularAndCount(_popularityProductDictionary);
         return new MostPopular(_mostPopularBrand, _mostPopularCategory, _mostPopularProduct);
     }
 }
